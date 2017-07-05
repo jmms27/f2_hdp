@@ -1,0 +1,26 @@
+- hosts: all
+  remote_user: vagrant
+  become: true
+  tasks:
+   - name: Instalar paquetes
+     apt: name={{ item }} state=installed
+     with_items:
+      - git
+      - apache2
+      - mysql-server
+      - php5
+      - php5-common
+      - libapache2-mod-php5
+      - php5-cli
+      - php5-fpm
+      - php5-mysql
+      - php5-xml
+      - phpmyadmin
+   - name: Crear Base de datos para Drupal
+     mysql_db: name=drupal state=present
+   - name: Crear usuario para drupal
+     mysql_user: name=drupal host=localhost password=admin priv=drupal.*:ALL
+   - name: Descargando archivos del repositorio
+     git: repo=https://github.com/jmms27/f2_hdp.git dest=/var/www/html/
+   - name: Base de datos
+     mysql_db: login_user=drupal login_password=admin state=import name=drupal target=/var/www/html/drupal/drupa.sql
